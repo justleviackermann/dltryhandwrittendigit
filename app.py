@@ -7,8 +7,16 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 import tensorflow as tf
 import keras
 import numpy as np
-from PIL import Image, ImageOps
 
+from PIL import Image, ImageOps, ImageFilter
+
+# ... inside your upload block ...
+image = ImageOps.invert(image)
+
+# NEW: Blur it slightly and then threshold it to "smear" the lines together
+# This fills in those sprinkle holes!
+image = image.filter(ImageFilter.GaussianBlur(radius=1)) 
+image = image.point(lambda p: 255 if p > 100 else 0) # Hard threshold
 # 1. Load the trained model
 @st.cache_resource
 def load_my_model():
