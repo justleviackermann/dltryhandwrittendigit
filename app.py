@@ -26,17 +26,19 @@ st.info("Tip: Use a dark pen on white paper and center the digit!")
 uploaded_file = st.file_uploader("Upload an image...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    # Open the image
     raw_image = Image.open(uploaded_file)
     
-    # Preprocessing Pipeline
-    # A. Convert to Grayscale
+    # 1. Convert to grayscale
     image = raw_image.convert('L') 
     
-    # B. Invert Colors (Model needs white ink on black background)
+    # 2. Invert colors
     image = ImageOps.invert(image) 
     
-    # C. Resize to the exact size the model was trained on
+    # 3. NEW: Boost Contrast (Binarization)
+    # This makes anything dim turn black and anything bright turn pure white
+    image = image.point(lambda p: 255 if p > 140 else 0) 
+    
+    # 4. Resize
     image = image.resize((28, 28))
     
     # D. Display what the model sees (for debugging)
